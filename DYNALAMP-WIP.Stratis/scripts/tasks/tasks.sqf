@@ -11,7 +11,7 @@ vehCount = (paramsArray select 6); // How many vehicles you'd like at each objec
 //sleep 20;
 SideHQ = createCenter east;
 
-tasksCompletedCount = 0; 
+taskscompletedcount = 0; 
 
 firstmark = false;
 secondmark = false;
@@ -25,13 +25,21 @@ locationPicked = false;
 taskNumber = 1;
 firsttask = false;
 
+m1 = 0;
+timeSkipped= 0;
+
 // Pick Location ///////////////////////////////////////////////////////////////////////
-while {tasksCompletedCount < tasksToComplete} do {
-  
-n1 = round ((random tasksToComplete) + 0.5); // generates random number
-if (timeSkip == 1) then {
-  timeSkipped = round ((random 6) + 6);// generates random number from 6-12
+while {taskscompletedcount < tasksToComplete} do {
+if (isServer) then {
+  //n1 = round ((random tasksToComplete) + 0.5); // generates random number
+  if (timeSkip == 1) then {
+    timeSkipped = round ((random 6) + 6);// generates random number from 6-12
+    publicVariable "timeSkipped";
+  };
 };
+
+hint format['timeSkipped is %1', timeSkipped];
+
 
 
 if (!firsttask) then
@@ -41,10 +49,15 @@ if (!firsttask) then
     newTask = player createSimpleTask [format ["Assault Units %1", taskNumber]];
     skipTime (timeSkipped);
     while {!locationPicked} do {
-		  m1 = round ((random 6) + 1);
+		  if (isServer) then {
+        m1 = round ((random 6) + 1);
+        publicVariable "m1";
+      };
    		if (m1 == 1 && !firstmark) then {
    			locationPicked = true;
-   			newTask setSimpleTaskDestination (getMarkerPos "m1");   			
+        publicVariable "locationPicked";
+   			newTask setSimpleTaskDestination (getMarkerPos "m1");
+        publicVariable "newTask";   			
    			createUnits = ["m1","airfield", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";
         sleep 5;
    			firstmark = true;
@@ -57,7 +70,9 @@ if (!firsttask) then
    		};
    		if (m1 == 2 && !secondmark) then {  
    			locationPicked = true; 			
-   			newTask setSimpleTaskDestination (getMarkerPos "m2");   			
+        publicVariable "locationPicked";
+   			newTask setSimpleTaskDestination (getMarkerPos "m2");   	
+        publicVariable "newTask";		
    			createUnits = ["m2","agia", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";
         sleep 5;
    			firstmark = false;
@@ -70,7 +85,9 @@ if (!firsttask) then
    		};
    		if (m1 == 3 && !thirdmark) then {
    			locationPicked = true;			
-   			newTask setSimpleTaskDestination (getMarkerPos "m3");		
+        publicVariable "locationPicked";
+   			newTask setSimpleTaskDestination (getMarkerPos "m3");	
+        publicVariable "newTask";	
    			createUnits = ["m3","kamino", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";   	
         sleep 5;
    			firstmark = false;
@@ -83,7 +100,9 @@ if (!firsttask) then
    		};
    		if (m1 == 4 && !fourthmark) then {
    			locationPicked = true;
+        publicVariable "locationPicked";
    			newTask setSimpleTaskDestination (getMarkerPos "m4");	
+        publicVariable "newTask";
    			createUnits = ["m4","mike26", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";
         sleep 5;
    			firstmark = false;
@@ -96,7 +115,9 @@ if (!firsttask) then
    		};
       if (m1 == 5 && !fifthmark) then {
         locationPicked = true;
+        publicVariable "locationPicked";
         newTask setSimpleTaskDestination (getMarkerPos "m5");  
+        publicVariable "newTask";
         createUnits = ["m5","maxwell", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";
         sleep 5;
         firstmark = false;
@@ -109,7 +130,9 @@ if (!firsttask) then
       };
       if (m1 == 6 && !sixthmark) then {
         locationPicked = true;
+        publicVariable "locationPicked";
         newTask setSimpleTaskDestination (getMarkerPos "m6");  
+        publicVariable "newTask";
         createUnits = ["m6","tempest", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";
         sleep 5;
         firstmark = false;
@@ -122,7 +145,9 @@ if (!firsttask) then
       };
       if (m1 == 7 && !seventhmark) then {
         locationPicked = true;
+        publicVariable "locationPicked";
         newTask setSimpleTaskDestination (getMarkerPos "m7");  
+        publicVariable "newTask";
         createUnits = ["m7","girna", unitsMin, unitsMax, vehOn, vehCount] execVM "scripts\tasks\createUnits.sqf";
         sleep 5;
         firstmark = false;
@@ -135,15 +160,21 @@ if (!firsttask) then
       };
     };
         locationPicked = false;
+        publicVariable "locationPicked";
         newTask setTaskState "Assigned";
+        publicVariable "newTask";
         player setCurrentTask newTask;
         waitUntil {({alive _x} count units newgroup) == 0 || ({alive _x} count units newgroup) <= unitsLeft};
         deleteGroup newgroup;
         newTask setTaskState "Succeeded";
+        publicVariable "newTask";
         hint format["Objective %1 Complete",taskNumber];
         taskNumber = taskNumber + 1;
-        tasksCompletedCount = tasksCompletedCount + 1;
+        publicVariable "taskNumber";
+        taskscompletedcount = taskscompletedcount + 1;
+        publicVariable "taskscompletedcount";
         firsttask = false;
+        publicVariable "firsttask";
         sleep 5;
     
   };
